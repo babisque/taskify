@@ -11,6 +11,7 @@ class Task
 {
     private readonly int $id;
     public readonly DateTime $createdAt;
+    public readonly DateTime $updatedAt;
 
     public function __construct(
         public string $name,
@@ -29,5 +30,10 @@ class Task
     public function setCreatedAt(DateTime $date): void
     {
         $this->createdAt = $date;
+    }
+
+    public function setUpdatedAt(DateTime $date): void
+    {
+        $this->updatedAt = $date;
     }
 }
