@@ -9,7 +9,7 @@ use DateTimeImmutable;
 
 class Task
 {
-    private readonly int $id;
+    public readonly int $id;
     public readonly DateTime $createdAt;
     public readonly DateTime $updatedAt;
 
