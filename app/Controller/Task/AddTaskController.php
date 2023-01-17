@@ -24,27 +24,24 @@ class AddTaskController implements Controller
 
         $priority = filter_input(INPUT_POST, 'priority', FILTER_VALIDATE_INT);
         if ($priority < 1 || $priority > 3) {
-            echo $priority;
             $priority = 1;
         }
 
         $status = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
         if ($status < 1 || $status > 3) {
-            echo $status;
             $status = 1;
         }
 
         $task = new Task($name, $description, $priority, $status);
-        if (ValidationHelper::isValidObject($task) === false) {
-            echo "isnt an object";
+        if (!ValidationHelper::isValidObject($task)) {
+            http_response_code(400);
             exit();
         }
 
-        if ($this->taskRepository->add($task) === false) {
-            echo "cannot persist this";
-            exit();
+        if (!$this->taskRepository->add($task)) {
+            http_response_code(400);
         } else {
-            return http_response_code(201);
+            http_response_code(201);
         }
 	}
 }

@@ -6,12 +6,14 @@ use App\Taskify\Controller\Task\{
     AddTaskController,
     OneTaskController,
     TaskListController,
-    DeleteTaskController
+    DeleteTaskController,
+    UpdateTaskController
 };
 
 return [
     'GET|/list-task' => TaskListController::class,
     'GET|/task' => OneTaskController::class,
-    'POST|/new-task' => AddTaskController::class,
     'GET|/delete' => DeleteTaskController::class,
+    'POST|/new-task' => AddTaskController::class,
+    'POST|/edit-task' => UpdateTaskController::class,
 ];
