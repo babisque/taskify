@@ -29,6 +29,9 @@ class AddTaskController implements Controller
         if (!ValidationHelper::validateStatus($taskData['status'])) {
             $taskData['status'] = 1;
         }
+
+        $taskData['name'] = trim($taskData['name']);
+        $taskData['description'] = trim($taskData['description']);
         
         $task = new Task($taskData['name'], $taskData['description'], $taskData['priority'], $taskData['status']);
         if (!ValidationHelper::isValidObject($task)) {
