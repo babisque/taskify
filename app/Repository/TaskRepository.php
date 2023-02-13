@@ -17,7 +17,8 @@ class TaskRepository
 
     public function add(Task $task): bool
     {
-        $task->setCreatedAt(new DateTime("now"));
+        $date = new DateTime("now");
+        $task->setCreatedAt($date->format('Y-m-d H:i:s'));
 
         try {
             $sql = "INSERT INTO task (name, description, priority, status, created_at) VALUES (:name, :description, :priority, :status, :created_at);";
@@ -27,7 +28,7 @@ class TaskRepository
             $statement->bindValue(':description', $task->description);
             $statement->bindValue(':priority', $task->priority);
             $statement->bindValue(':status', $task->status);
-            $statement->bindValue(':created_at', $task->createdAt->format('Y-m-d H:i:s'));
+            $statement->bindValue(':created_at', $task->getCreatedAt()->format('Y-m-d H:i:s'));
 
             $result = $statement->execute();
         } catch (PDOException $e) {
@@ -60,17 +61,18 @@ class TaskRepository
     public function update(Task $task): bool
     {
         $date = new DateTime("now");
+        $dateFormated = $date->format('Y-m-d H:i:s');
 
         try {
-            $sql = "UPDATE task SET name = :name, description = :description, priority = :priority, status = :status, created_at = :created_at, updated_at = :updated_at;";
+            $sql = "UPDATE task SET name = :name, description = :description, priority = :priority, status = :status, updated_at = :updated_at WHERE id = :id;";
 
             $statement = $this->pdo->prepare($sql);
             $statement->bindValue(':name', $task->name);
             $statement->bindValue(':description', $task->description);
             $statement->bindValue(':priority', $task->priority);
             $statement->bindValue(':status', $task->status);
-            $statement->bindValue(':created_at', $task->createdAt);
-            $statement->bindValue(':updated_at', $date);
+            $statement->bindValue(':updated_at', $dateFormated);
+            $statement->bindValue(':id', $task->getId());
             $result = $statement->execute();
         } catch (PDOException $e) {
             http_response_code(500);
@@ -117,22 +119,18 @@ class TaskRepository
             exit();
         }
 
-        if ($task !== false && $task !== null) {
-            return $this->hydrateTask($task);
-        } else {
-            return false;
-        }
+        return $this->hydrateTask($task);
     }
 
     private function hydrateTask(array $taskData): Task
     {
-
         $task = new Task($taskData['name'], $taskData['description'], $taskData['priority'], $taskData['status']);
         $task->setId($taskData['id']);
-        $task->setCreatedAt(new DateTime($taskData['created_at']));
+        $task->setCreatedAt($taskData['created_at']);
         if (isset($taskData['updated_at'])) {
             $task->setUpdatedAt($taskData['updated_at']);
         }
+        
         return $task;
     }
 }

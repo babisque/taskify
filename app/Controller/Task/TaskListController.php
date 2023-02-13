@@ -18,10 +18,18 @@ class TaskListController implements Controller
 	
 	public function processRequest()
     {
-        $taskData = $this->taskRepository->all();
-        $jsonData = json_encode($taskData);
+        $taskList = array_map(function (Task $task): array {
+            return [
+                'name' => $task->name,
+                'description' => $task->description,
+                'priority' => $task->priority,
+                'status' => $task->status,
+                'created_at' => $task->getCreatedAt(),                
+            ];
+        }, $this->taskRepository->all());
+
         header('Content-Type: application/json');
         http_response_code(200);
-        echo $jsonData;
+        echo json_encode($taskList);
 	}
 }

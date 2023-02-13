@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/composer,visualstudiocode,dotenv
-# Edit at https://www.toptal.com/developers/gitignore?templates=composer,visualstudiocode,dotenv
+# Created by https://www.toptal.com/developers/gitignore/api/composer,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=composer,visualstudiocode
 
 ### Composer ###
 composer.phar
@@ -8,9 +8,6 @@ composer.phar
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
-
-### dotenv ###
-.env
 
 ### VisualStudioCode ###
 .vscode/*
@@ -31,4 +28,4 @@ composer.phar
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/composer,visualstudiocode,dotenv
+# End of https://www.toptal.com/developers/gitignore/api/composer,visualstudiocode

@@ -19,20 +19,18 @@ class AddTaskController implements Controller
 
 	public function processRequest()
     {
-        $name = filter_input(INPUT_POST, 'name');
-        $description = filter_input(INPUT_POST, 'description');
+        $request = file_get_contents('php://input');
+        $taskData = json_decode($request, true);
 
-        $priority = filter_input(INPUT_POST, 'priority', FILTER_VALIDATE_INT);
-        if ($priority < 1 || $priority > 3) {
-            $priority = 1;
+        if (!ValidationHelper::validatePriority($taskData['priority'])) {
+            $taskData['priority'] = 1;
         }
 
-        $status = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
-        if ($status < 1 || $status > 3) {
-            $status = 1;
+        if (!ValidationHelper::validateStatus($taskData['status'])) {
+            $taskData['status'] = 1;
         }
-
-        $task = new Task($name, $description, $priority, $status);
+        
+        $task = new Task($taskData['name'], $taskData['description'], $taskData['priority'], $taskData['status']);
         if (!ValidationHelper::isValidObject($task)) {
             http_response_code(400);
             exit();

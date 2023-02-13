@@ -9,9 +9,9 @@ use DateTimeImmutable;
 
 class Task
 {
-    public readonly int $id;
-    public readonly DateTime $createdAt;
-    public readonly DateTime $updatedAt;
+    private int $id;
+    private DateTime $createdAt;
+    private DateTime $updatedAt;
 
     public function __construct(
         public string $name,
@@ -22,18 +22,34 @@ class Task
     {
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function setCreatedAt(DateTime $date): void
+    public function getCreatedAt(): DateTime
     {
-        $this->createdAt = $date;
+        return $this->createdAt;
     }
 
-    public function setUpdatedAt(DateTime $date): void
+    public function setCreatedAt(string $date): void
     {
-        $this->updatedAt = $date;
+        $this->createdAt = new DateTime($date);
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt($date): void
+    {
+
+        $this->updatedAt = new DateTime($date);
     }
 }

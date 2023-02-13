@@ -11,41 +11,40 @@ use DateTime;
 
 class UpdateTaskController implements Controller
 {
-    
-	/**
-	 * @param \App\Taskify\Repository\TaskRepository $taskRepository
-	 */
-	public function __construct(private $taskRepository)
+
+    /**
+     * @param \App\Taskify\Repository\TaskRepository $taskRepository
+     */
+    public function __construct(private $taskRepository)
     {
-	}
-    
-	public function processRequest()
+    }
+
+    public function processRequest()
     {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-        if ($id === false || $id === null) {
-            http_response_code(204);
-            exit();
+        $request = file_get_contents('php://input');
+        $taskData = json_decode($request, true);
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+        if (!ValidationHelper::validatePriority($taskData['priority'])) {
+            $taskData['priority'] = 1;
         }
 
-        $name = filter_input(INPUT_POST, 'name');
-        $description = filter_input(INPUT_POST, 'description');
-        $priority = filter_input(INPUT_POST, 'priority', FILTER_VALIDATE_INT);
-        $status = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
-        $date = new DateTime(filter_input(INPUT_POST, 'created_at'));
+        if (!ValidationHelper::validateStatus($taskData['status'])) {
+            $taskData['status'] = 1;
+        }
 
-        $task = new Task($name, $description, $priority, $status);
+        $task = new Task($taskData['name'], $taskData['description'], $taskData['priority'], $taskData['status']);
         $task->setId($id);
-        $task->setCreatedAt($date);
 
-        if (ValidationHelper::isValidObject($task) === false) {
+        if (!ValidationHelper::isValidObject($task)) {
             http_response_code(400);
             exit();
         }
 
-        if ($this->taskRepository->update($task)) {
-            http_response_code(200);
-        } else {
+        if (!$this->taskRepository->update($task)) {
             http_response_code(400);
+        } else {
+            http_response_code(201);
         }
-	}
+    }
 }

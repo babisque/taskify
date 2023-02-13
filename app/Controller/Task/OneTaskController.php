@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Taskify\Controller\Task;
 
 use App\Taskify\Controller\Controller;
+use App\Taskify\Helper\ValidationHelper;
 
 class OneTaskController implements Controller
 {	/**
@@ -17,20 +18,18 @@ class OneTaskController implements Controller
 	public function processRequest()
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-        if ($id === false || $id === null) {
-            http_response_code(400);
+        if (!ValidationHelper::validateId($id)) {
+            http_response_code(204);
             exit();
         }
 
-        $task = $this->taskRepository->findById($id);
-        if ($task === false || $task === null) {
-            http_response_code(404);
-            exit();
-        }
+        $taskData = $this->taskRepository->findById($id);
+        $task = get_object_vars($taskData);
+        $task['id'] = $taskData->getId();
+        $task['created_at'] = $taskData->getCreatedAt();
 
-        $jsonData = json_encode($task);
         header('Content-Type: application/json');
         http_response_code(200);
-        echo $jsonData;
+        echo json_encode($task);
 	}
 }
