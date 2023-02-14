@@ -119,6 +119,9 @@ class TaskRepository
             exit();
         }
 
+        if ($task === null || $task === false) {
+            return;
+        }
         return $this->hydrateTask($task);
     }
 

@@ -24,6 +24,12 @@ class OneTaskController implements Controller
         }
 
         $taskData = $this->taskRepository->findById($id);
+
+        if ($taskData === null) {
+            http_response_code(404);
+            return;
+        }
+
         $task = get_object_vars($taskData);
         $task['id'] = $taskData->getId();
         $task['created_at'] = $taskData->getCreatedAt();

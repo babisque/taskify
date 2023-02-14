@@ -22,8 +22,14 @@ class DeleteTaskController implements Controller
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         
         if (!ValidationHelper::validateId($id)) {
-            http_response_code(204);
+            http_response_code(404);
             exit();
+        }
+
+        $task = $this->taskRepository->findById($id);
+        if ($task === null) {
+            http_response_code(404);
+            return;
         }
 
         if ($this->taskRepository->remove($id)) {

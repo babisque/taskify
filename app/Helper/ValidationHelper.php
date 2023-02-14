@@ -18,28 +18,16 @@ class ValidationHelper
 
     public static function validateId($id): bool
     {
-        if ($id === null || $id === false) {
-            return false;
-        }
-
-        return true;
+        return is_int($id) && $id > 0;
     }
 
-    public static function validatePriority($priority): bool
+    public static function validatePriority($priority): int
     {
-        if ($priority < 1 || $priority > 3) {
-            return false;
-        }
-
-        return true;
+        return max(1, min($priority, 3));
     }
 
-    public static function validateStatus($status): bool
+    public static function validateStatus($status): int
     {
-        if ($status < 1 || $status > 3) {
-            return false;
-        }
-
-        return true;
+        return max(1, min($status, 3));
     }
 }

@@ -20,6 +20,7 @@ class TaskListController implements Controller
     {
         $taskList = array_map(function (Task $task): array {
             return [
+                'id' => $task->getId(),
                 'name' => $task->name,
                 'description' => $task->description,
                 'priority' => $task->priority,

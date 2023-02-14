@@ -22,13 +22,11 @@ class AddTaskController implements Controller
         $request = file_get_contents('php://input');
         $taskData = json_decode($request, true);
 
-        if (!ValidationHelper::validatePriority($taskData['priority'])) {
-            $taskData['priority'] = 1;
-        }
+        $priority = ValidationHelper::validatePriority($taskData['priority']);
+        $taskData['priority'] = $priority;
 
-        if (!ValidationHelper::validateStatus($taskData['status'])) {
-            $taskData['status'] = 1;
-        }
+        $status = ValidationHelper::validateStatus($taskData['status']);
+        $taskData['status'] = $status;
 
         $taskData['name'] = trim($taskData['name']);
         $taskData['description'] = trim($taskData['description']);
