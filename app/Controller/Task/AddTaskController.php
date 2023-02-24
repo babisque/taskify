@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Taskify\Controller\Task;
+
 use App\Taskify\Controller\Controller;
 use App\Taskify\Helper\ValidationHelper;
 use App\Taskify\Model\Task;
@@ -17,7 +18,7 @@ class AddTaskController implements Controller
     {
     }
 
-	public function processRequest()
+    public function processRequest()
     {
         $request = file_get_contents('php://input');
         $taskData = json_decode($request, true);
@@ -30,17 +31,19 @@ class AddTaskController implements Controller
 
         $taskData['name'] = trim($taskData['name']);
         $taskData['description'] = trim($taskData['description']);
-        
+
         $task = new Task($taskData['name'], $taskData['description'], $taskData['priority'], $taskData['status']);
         if (!ValidationHelper::isValidObject($task)) {
+            header('Content-Type: application/json');
             http_response_code(400);
+            echo json_encode(["http_status_code" => 400, "error" => "bad request"], JSON_PRETTY_PRINT);
             exit();
         }
 
-        if (!$this->taskRepository->add($task)) {
-            http_response_code(400);
-        } else {
-            http_response_code(201);
-        }
-	}
+        $this->taskRepository->add($task);
+
+        http_response_code(201);
+        header('Content-Type: application/json');
+        echo json_encode($task, JSON_PRETTY_PRINT);
+    }
 }

@@ -6,8 +6,10 @@ namespace App\Taskify\Repository;
 
 use App\Taskify\Model\Task;
 use DateTime;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
+use RuntimeException;
 
 class TaskRepository
 {
@@ -17,24 +19,20 @@ class TaskRepository
 
     public function add(Task $task): bool
     {
-        $date = new DateTime("now");
-        $task->setCreatedAt($date->format('Y-m-d H:i:s'));
-
         try {
-            $sql = "INSERT INTO task (name, description, priority, status, created_at) VALUES (:name, :description, :priority, :status, :created_at);";
+            $sql = "INSERT INTO task (name, description, priority, status, created_at) VALUES (:name, :description, :priority, :status, now());";
 
             $statement = $this->pdo->prepare($sql);
             $statement->bindValue(':name', $task->name);
             $statement->bindValue(':description', $task->description);
             $statement->bindValue(':priority', $task->priority);
             $statement->bindValue(':status', $task->status);
-            $statement->bindValue(':created_at', $task->getCreatedAt()->format('Y-m-d H:i:s'));
 
             $result = $statement->execute();
         } catch (PDOException $e) {
             http_response_code(500);
-            print_r(json_encode($e));
-            return false;
+            echo json_encode(["error" => $e->getMessage()], JSON_PRETTY_PRINT);
+            exit();
         }
 
         $id = $this->pdo->lastInsertId();
@@ -49,35 +47,35 @@ class TaskRepository
             $statement = $this->pdo->prepare($sql);
             $statement->bindValue(1, $id);
             $result = $statement->execute();
-        } catch (PDOException $e) {
-            http_response_code(500);
-            print_r(json_encode($e));
-            return false;
-        }
 
-        return $result;
+            if (!$result) {
+                throw new RuntimeException("Failed to delete task with ID: $id");
+            }
+
+            return true;
+        } catch (PDOException | InvalidArgumentException | RuntimeException $e) {
+            http_response_code(500);
+            echo json_encode(["error" => $e->getMessage()], JSON_PRETTY_PRINT);
+            exit();
+        }
     }
 
     public function update(Task $task): bool
     {
-        $date = new DateTime("now");
-        $dateFormated = $date->format('Y-m-d H:i:s');
-
         try {
-            $sql = "UPDATE task SET name = :name, description = :description, priority = :priority, status = :status, updated_at = :updated_at WHERE id = :id;";
+            $sql = "UPDATE task SET name = :name, description = :description, priority = :priority, status = :status, updated_at = now() WHERE id = :id;";
 
             $statement = $this->pdo->prepare($sql);
             $statement->bindValue(':name', $task->name);
             $statement->bindValue(':description', $task->description);
             $statement->bindValue(':priority', $task->priority);
             $statement->bindValue(':status', $task->status);
-            $statement->bindValue(':updated_at', $dateFormated);
             $statement->bindValue(':id', $task->getId());
             $result = $statement->execute();
         } catch (PDOException $e) {
             http_response_code(500);
-            print_r(json_encode($e));
-            return false;
+            echo json_encode(["error" => $e->getMessage()], JSON_PRETTY_PRINT);
+            exit();
         }
 
         return $result;
@@ -94,7 +92,7 @@ class TaskRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             http_response_code(500);
-            print_r(json_encode($e));
+            echo json_encode(["error" => $e->getMessage()], JSON_PRETTY_PRINT);
             exit();
         }
 
@@ -115,7 +113,7 @@ class TaskRepository
             $task = $statement->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             http_response_code(500);
-            print_r(json_encode($e));
+            echo json_encode(["error" => $e->getMessage()], JSON_PRETTY_PRINT);
             exit();
         }
 
@@ -133,7 +131,7 @@ class TaskRepository
         if (isset($taskData['updated_at'])) {
             $task->setUpdatedAt($taskData['updated_at']);
         }
-        
+
         return $task;
     }
 }

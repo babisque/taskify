@@ -26,13 +26,17 @@ class UpdateTaskController implements Controller
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         if (!ValidationHelper::validateId($id)) {
             http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(["message" => "Invalid task ID"], JSON_PRETTY_PRINT);
             exit();
         }
 
         $task = $this->taskRepository->findById($id);
         if ($task === null) {
             http_response_code(404);
-            return;
+            header('Content-Type: application/json');
+            echo json_encode(["message" => "Task not found"], JSON_PRETTY_PRINT);
+            exit();
         }
 
         $priority = ValidationHelper::validatePriority($taskData['priority']);
@@ -49,13 +53,13 @@ class UpdateTaskController implements Controller
 
         if (!ValidationHelper::isValidObject($task)) {
             http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(["http_status_code" => 400, "error" => "bad request"], JSON_PRETTY_PRINT);
             exit();
         }
 
-        if (!$this->taskRepository->update($task)) {
-            http_response_code(400);
-        } else {
-            http_response_code(201);
-        }
+        $this->taskRepository->update($task);
+        
+        http_response_code(204);
     }
 }
